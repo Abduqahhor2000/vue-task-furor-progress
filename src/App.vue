@@ -12,7 +12,7 @@
       </div>
     </nav>
 
-    <div class="container">
+    <div class="container table-c">
       <table class="table table-striped table-hover">
         <thead>
           <td class="px-2">ID</td>
@@ -30,7 +30,7 @@
             <td>{{product.name_uz}}</td>
             <td>{{product.cost}}</td>
             <td>{{product.address}}</td>
-            <td>{{product.created_date}}</td>
+            <td>{{farmatDate(product.created_date)}}</td>
             <td>
               <div @click="editButtonFunc(product)" class="btn btn-primary text-white btn-sm mx-2">Edit</div>
               <div @click="deleteProduct(product.id)" class="btn btn-danger text-white btn-sm">Delete</div>
@@ -230,6 +230,28 @@
           }catch(err){
             console.log(err)
           }
+        },
+        farmatDate(date) {
+          const date1 = new Date(date)
+          const date2 = date1.getDate()
+          const date3 = date1.getFullYear()
+          const date4 = date1.getHours()
+          const date5 = date1.getMinutes()
+          const date6 = date1.getMonth()
+          return `${date4}:${date5} ${date2}-${
+              date6 === 0 ? "Yanvar"
+            : date6 === 1 ? "Febral"
+            : date6 === 2 ? "Mart"
+            : date6 === 3 ? "Aprel"
+            : date6 === 4 ? "May"
+            : date6 === 5 ? "Iyun"
+            : date6 === 6 ? "Iyul"
+            : date6 === 7 ? "Avgust"
+            : date6 === 8 ? "Sentabr"
+            : date6 === 9 ? "Oktiyabr"
+            : date6 === 10 ? "Noyabr"
+            : date6 === 11 ? "Dekabr" : null
+          } ${date3}`
         }
     },
     mounted(){
@@ -254,18 +276,9 @@
   .d-block{
     display: block !important;
   }
+  .table-c{
+    min-height: 510px;
+  }
 </style>
 
-<style>
-/* <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Dropdown
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
-              </ul>
-            </li> */
-</style>
+
