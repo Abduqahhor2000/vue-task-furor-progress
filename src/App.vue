@@ -6,14 +6,14 @@
           <div></div>
           <div class="d-flex lalula">
             <div @click="IsModalOpen" class="btn btn-success text-white mx-2">Add Product</div>
-            <input class="form-control me-2" type="search" placeholder="Search..." aria-label="Search">
+            <input v-model="searchName" class="form-control me-2" type="search" placeholder="Search..." aria-label="Search">
           </div>
         </div>
       </div>
     </nav>
 
-    <div class="container table-c">
-      <table class="table table-striped table-hover">
+    <div  class="container table-c">
+      <table v-if="!isLoading" class="table table-striped table-hover">
         <thead>
           <td class="px-2">ID</td>
           <td class="px-2">Type ID</td>
@@ -38,11 +38,22 @@
          </tr>
         </tbody>
       </table>
-    </div> 
+      <div v-else-if="isLoading" class="d-flex justify-content-center">
+        <div class="spinner-grow text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-secondary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-success" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
 
-    <div class="container d-flex justify-content-center">
+    <div class="container d-flex justify-content-center mt-3">
       <div class="w-auto d-flex justify-content-between">
-        <div @click="changePage('next')">
+        <div @click="changePage('back')">
           <div class="btn btn-outline-primary mx-1">
             {{"<<"}}
           </div>
@@ -57,7 +68,7 @@
             {{pagebutton}}                
           </div>
         </div>
-        <div @click="changePage('back')">
+        <div @click="changePage('next')">
           <div class="btn btn-outline-primary mx-1">
             {{">>"}}
           </div>
@@ -100,8 +111,9 @@
     data(){
       return{
         products: [],
+        searchName: "",
         totalPages: 0,
-        truePage: 1,
+        truePage: 2,
         limitItems: 10,
         
         id: 0,
@@ -112,6 +124,8 @@
 
         isModalOpen: false,
         isAddOpen: false,
+
+        isLoading: false,
       }
     },
     methods:{
@@ -121,6 +135,7 @@
         },
 
         async getProducts(){
+          this.isLoading = true
           try{
             const response = await axios.get("/api/product", {
               params:{
@@ -128,14 +143,15 @@
                 perPage: this.limitItems,
               }
             })
-            if(response.data.length === 0){
-                this.truePage -= 1
+            if(response.data.length === 0 && this.truePage > 1){
+                this.truePage -= 1 
                 this.getProducts()
-                return;
             }
             this.products = response.data
+            this.isLoading = false
           }catch(err){
             console.log(err)
+            this.isLoading = false
           }
         },
         async deleteProduct(id){
@@ -199,28 +215,25 @@
             this.name_uz = ""
             this.cost = 0
             this.address = ""
-            this.getProducts()
           }catch(err){
             console.log("error", err)
           }
         },
 
         changePage(number){
-          if(number === "next"){
-            if(this.truePage > 1){
-              this.truePage -= 1
-              this.getProducts()
-            }
-            return;
-          }else if(number === "back"){
-            if(this.truePage < this.totalPages){
+          if(number >= 1){
+            this.truePage = number;
+            this.getProducts()
+
+          } else if(number === "next" && this.truePage < this.totalPages){
               this.truePage += 1
               this.getProducts()
-            }
-            return;
-          }
-          this.truePage = number;
-          this.getProducts()
+            
+          } else if(number === "back" && this.truePage > 1){
+              this.truePage -= 1
+              this.getProducts()
+          } 
+          console.log(this.truePage)
         },
 
         async getTotalPage(){
@@ -257,7 +270,7 @@
     mounted(){
       this.getTotalPage()
       this.getProducts();
-    }  
+    }
   }
 </script>
  
